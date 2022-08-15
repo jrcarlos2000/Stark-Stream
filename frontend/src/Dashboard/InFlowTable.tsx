@@ -37,11 +37,7 @@ const columns = [
     columnHelper.accessor("netFlow", {
         header: "NET FLOW",
         cell: (info) => <ColoredFlowrate flowrate={info.getValue()} />
-    }),
-    columnHelper.accessor("netFlow", {
-        header: "In / Out",
-        cell: (info) => <ColoredFlowrate flowrate={info.getValue()} />
-    }),
+    })
 ];
 
 
@@ -82,6 +78,41 @@ export default function InFlowTable({ handleExpand }: { handleExpand: (row: any)
         }
         AsyncFn();
     }, [mBTC_balance_result, mUSDT_balance_result, mDAI_balance_result])
+
+//       const data=[{
+//     asset: "mUSDT",
+//     balance: {
+//       startTime: Date.now(),
+//       flowrate: 0,
+//       staticBalance: 0
+//     },
+//     netFlow: 10,
+//     inflow: "done",
+//     image: "",
+//   },
+//   {
+//     asset: "mBTC",
+//     balance: {
+//       startTime: Date.now(),
+//       flowrate: 0,
+//       staticBalance: 0
+//     },
+//     netFlow: -19,
+//     inflow: "done",
+//     image: "",
+//   },
+//   {
+//     asset: "mDAI",
+//     balance: {
+//       startTime: Date.now(),
+//       flowrate: 0,
+//       staticBalance: 0
+//     },
+//     netFlow: 72,
+//     inflow: "done",
+//     image: "",
+//   }
+// ]
 
     return (
         <Table title="Inflow Tokens" columns={columns} data={data} handleExpand={handleExpand} />

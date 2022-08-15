@@ -44,7 +44,7 @@ const selectDropdownStyle = {
 }
 
 
-const StreamingCard: FC<{ mode: string, _streamType: string, txData: IDetailBreakdownSingle | IDetailBreakdownMulti | {} }> = ({ mode, _streamType, txData }) => {
+const StreamingCard: FC<{ mode: string, _streamType: string, txData?: IDetailBreakdownSingle | IDetailBreakdownMulti }> = ({ mode, _streamType, txData }) => {
 
   const [streamType, setStreamType] = useState<string>(_streamType || "Direct");
   const [detailData, setDetailData] = useState<any>();

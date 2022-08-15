@@ -12,6 +12,7 @@ const Send: NextPage = () => {
   const query = useMemo(() => {
     console.log(router.query)
     if (router.query.hasOwnProperty("update")) {
+      console.log("update test: ", router.query)
       // fetch streaming data from contract
       // test data
       const updateDataSingle: IDetailBreakdownSingle = {
@@ -22,21 +23,21 @@ const Send: NextPage = () => {
           unit: "second"
         },
       }
-      const updateDataMulti: IDetailBreakdownMulti = {
-        receivers: [
-          {addr: "0x123", perc: 20},
-          {addr: "0x456", perc: 80}
-        ],
-        token: "USDC",
-        flowrate: {
-          value: 0.666,
-          unit: "second"
-        },
-      }
+      // const updateDataMulti: IDetailBreakdownMulti = {
+      //   receivers: [
+      //     {addr: "0x123", perc: 20},
+      //     {addr: "0x456", perc: 80}
+      //   ],
+      //   token: "USDC",
+      //   flowrate: {
+      //     value: 0.666,
+      //     unit: "second"
+      //   },
+      // }
       return {
         mode: "Update",
         _streamType: router.query.streamType as string,
-        txData: updateDataMulti
+        txData: updateDataSingle
       }
     } else {
       return {

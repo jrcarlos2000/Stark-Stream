@@ -6,6 +6,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useStarknet, useStarknetCall } from "@starknet-react/core";
 import { usemBTCContract, useUSDTContract, usemDAIContract, usemUSDTContract } from "../hooks/TokenContracts";
 import { readListOfStreams } from "../utils/core";
+import { Button } from "antd";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import Table from "./Table";
 import { createColumnHelper } from "@tanstack/react-table";
 import { IRealtimeBalanceProps, RealtimeBalance } from "./RealtimeBalance";
@@ -15,18 +17,21 @@ export type IOutFlowTableData = {
     id: number;
     to: string;
     flowrate: number;
-    balance: number;
+    balance: IRealtimeBalanceProps;
     stop: boolean;
     update: any;
 };
 
 const columnHelper = createColumnHelper<IOutFlowTableData>();
 
-export default function OutFlowTable({selectedToken}: {selectedToken: string}) {
+export default function OutFlowTable({ selectedToken }: { selectedToken: string }) {
+    const router = useRouter();
     // CONTRACT INVOKES
     const [data, setData] = useState<any>([]);
-    const handleStop = (streamId: number) => {}
-    const handleUpdate = (streamId: number) => {}
+    const handleStop = (selectedToken: string, streamId: number) => { }
+    const handleUpdate = (selectedToken: string, streamId: number) => {
+        router.push(`/stream?update&streamType=Direct&token=${selectedToken}&id=${streamId}`);
+    }
     const {connectors,account} = useStarknet();
     const {contract : cmBTC} = usemBTCContract();
     const {contract : cmDAI} = usemDAIContract();
@@ -63,23 +68,23 @@ export default function OutFlowTable({selectedToken}: {selectedToken: string}) {
         }),
         columnHelper.accessor("balance", {
             header: "Balance",
-            cell: (info) => <strong>{info.getValue()}</strong>,
+            cell: (info) => <RealtimeBalance {...info.getValue()} />,
         }),
         columnHelper.accessor("id", {
             header: "Stop",
             cell: (info) => {
                 const streamId = info.row.original.id
-                return <Button onClick={() => handleStop(streamId)}>stop</Button>
+                return <Button type="primary" onClick={() => handleStop(selectedToken, streamId)} shape="circle" icon={<DeleteOutlined />} />
             }
         }),
         columnHelper.accessor("id", {
-            header: "Updat",
+            header: "Update",
             cell: (info) => {
                 const streamId = info.row.original.id
-                return <Button onClick={() => handleUpdate(streamId)}>update</Button>
+                return <Button type="primary" onClick={() => handleUpdate(selectedToken, streamId)} shape="circle" icon={<EditOutlined />} />
             },
         }),
-    ], [columnHelper, handleStop, handleUpdate]);
+    ], [columnHelper, selectedToken, handleStop, handleUpdate]);
 
     return (
         <Table title={`Outflow Tokens: ${selectedToken}`} columns={columns} data={data} />
@@ -96,8 +101,8 @@ const MainContainer = styled.div`
   margin-top: 5rem;
 `;
 
-const Button = styled.button`
-  &:hover {
-    cursor: pointer;
-  }
-`;
+// const Button = styled.button`
+//   &:hover {
+//     cursor: pointer;
+//   }
+// `;
