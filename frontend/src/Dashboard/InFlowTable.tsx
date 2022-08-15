@@ -40,7 +40,7 @@ const columns = [
     },
   }),
   columnHelper.accessor("netFlow", {
-    header: "NET FLOW / sec",
+    header: "Flow rate",
     cell: (info) => <ColoredFlowrate flowrate={info.getValue()} />,
   }),
 ];
@@ -90,7 +90,8 @@ export default function InFlowTable({
         let new_data = await parseTokenData(
             mUSDT_balance_result,
             mDAI_balance_result,
-            mBTC_balance_result
+            mBTC_balance_result,
+            cmUSDT,cmDAI,cmBTC,account
           ) 
         setData(
             new_data

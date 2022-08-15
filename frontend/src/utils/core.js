@@ -3,10 +3,41 @@ import { formatEther } from "ethers/lib/utils";
 import { bnToUint256, uint256ToBN } from "starknet/dist/utils/uint256";
 import { toBN, toHex } from "starknet/utils/number";
 
-export async function parseTokenData(mUSTBalance, mDAIBalance, mBTCBalance){
+export async function parseTokenData(mUSTBalance, mDAIBalance, mBTCBalance, cmUSDT, cmDAI, cmBTC,account){
+
+
 
     // console.log('debugging balances',mUSTBalance, mDAIBalance, mBTCBalance );
     //perform other operations here
+    let netFlow = {
+        'mUSDT' : 0.0,
+        'mBTC' : 0.0,
+        'mDAI' : 0.0
+    };
+
+    try{
+        let res = (await cmUSDT.get_all_inflow_streams_by_user(toBN(account)))[0];
+        // console.log('debugging readList of streams',res);
+        for(let i=0;i<res.length;i++){
+
+            netFlow['mUSDT'] = netFlow['mUSDT'] + parseFloat(formatEther(uint256ToBN(res[i].amount_per_second).toString()))
+        }
+        let res2 = (await cmDAI.get_all_inflow_streams_by_user(toBN(account)))[0];
+        // console.log('debugging readList of streams',res);
+        for(let i=0;i<res2.length;i++){
+
+            netFlow['mDAI'] = netFlow['mDAI'] + parseFloat(formatEther(uint256ToBN(res2[i].amount_per_second).toString()))
+        }
+        let res3 = (await cmBTC.get_all_inflow_streams_by_user(toBN(account)))[0];
+        // console.log('debugging readList of streams',res);
+        for(let i=0;i<res3.length;i++){
+
+            netFlow['mBTC'] = netFlow['mBTC'] + parseFloat(formatEther(uint256ToBN(res3[i].amount_per_second).toString()))
+        }
+    }catch(e){
+        console.log('last try',e)
+    }
+
     return [{
         asset: "mUSDT",
         balance: {
@@ -14,7 +45,7 @@ export async function parseTokenData(mUSTBalance, mDAIBalance, mBTCBalance){
           flowrate: 0,
           staticBalance: parseFloat(formatEther((uint256ToBN(mUSTBalance[0])).toString()))
         },
-        netFlow: 10,
+        netFlow: netFlow["mUSDT"],
         inflow: "done",
         image: "",
       },
@@ -25,7 +56,7 @@ export async function parseTokenData(mUSTBalance, mDAIBalance, mBTCBalance){
           flowrate: 0,
           staticBalance: parseFloat(formatEther((uint256ToBN(mBTCBalance[0])).toString()))
         },
-        netFlow: -19,
+        netFlow: netFlow['mBTC'],
         inflow: "done",
         image: "",
       },
@@ -36,7 +67,7 @@ export async function parseTokenData(mUSTBalance, mDAIBalance, mBTCBalance){
           flowrate: 0,
           staticBalance: parseFloat(formatEther((uint256ToBN(mDAIBalance[0])).toString()))
         },
-        netFlow: 72,
+        netFlow: netFlow["mDAI"],
         inflow: "done",
         image: "",
       }

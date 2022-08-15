@@ -79,8 +79,6 @@ describe("demo Scripts", function () {
       });
     }
 
-    // await starknet.devnet.increaseTime(559756);
-
     let addressesFile = fs.readFileSync('../frontend/src/utils/addresses.json');
     let addresses = JSON.parse(addressesFile);
 
