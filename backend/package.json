@@ -29,6 +29,7 @@
     "compile": "./scripts/compile.sh",
     "deploy": "FLAGS=deploy npx hardhat test ",
     "test": "FLAGS=test npx hardhat test",
+    "fund" : "FLAGS=fund npx hardhat test",
     "demo": "FLAGS=demo npx hardhat test",
     "demo:pool" : "FLAGS=pool npx hardhat test"
   },

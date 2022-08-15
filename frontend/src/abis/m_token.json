@@ -1,0 +1,369 @@
+[
+    {
+        "members": [
+            {
+                "name": "low",
+                "offset": 0,
+                "type": "felt"
+            },
+            {
+                "name": "high",
+                "offset": 1,
+                "type": "felt"
+            }
+        ],
+        "name": "Uint256",
+        "size": 2,
+        "type": "struct"
+    },
+    {
+        "members": [
+            {
+                "name": "index",
+                "offset": 0,
+                "type": "felt"
+            },
+            {
+                "name": "amount_per_second",
+                "offset": 1,
+                "type": "Uint256"
+            },
+            {
+                "name": "created_timestamp",
+                "offset": 3,
+                "type": "felt"
+            },
+            {
+                "name": "to",
+                "offset": 4,
+                "type": "felt"
+            },
+            {
+                "name": "from_sender",
+                "offset": 5,
+                "type": "felt"
+            },
+            {
+                "name": "inflow_index",
+                "offset": 6,
+                "type": "felt"
+            },
+            {
+                "name": "deposit",
+                "offset": 7,
+                "type": "Uint256"
+            }
+        ],
+        "name": "outflow",
+        "size": 9,
+        "type": "struct"
+    },
+    {
+        "members": [
+            {
+                "name": "index",
+                "offset": 0,
+                "type": "felt"
+            },
+            {
+                "name": "amount_per_second",
+                "offset": 1,
+                "type": "Uint256"
+            },
+            {
+                "name": "created_timestamp",
+                "offset": 3,
+                "type": "felt"
+            },
+            {
+                "name": "to",
+                "offset": 4,
+                "type": "felt"
+            },
+            {
+                "name": "from_sender",
+                "offset": 5,
+                "type": "felt"
+            },
+            {
+                "name": "outflow_index",
+                "offset": 6,
+                "type": "felt"
+            },
+            {
+                "name": "deposit",
+                "offset": 7,
+                "type": "Uint256"
+            }
+        ],
+        "name": "inflow",
+        "size": 9,
+        "type": "struct"
+    },
+    {
+        "data": [
+            {
+                "name": "from_",
+                "type": "felt"
+            },
+            {
+                "name": "to",
+                "type": "felt"
+            },
+            {
+                "name": "value",
+                "type": "Uint256"
+            }
+        ],
+        "keys": [],
+        "name": "Transfer",
+        "type": "event"
+    },
+    {
+        "data": [
+            {
+                "name": "owner",
+                "type": "felt"
+            },
+            {
+                "name": "spender",
+                "type": "felt"
+            },
+            {
+                "name": "value",
+                "type": "Uint256"
+            }
+        ],
+        "keys": [],
+        "name": "Approval",
+        "type": "event"
+    },
+    {
+        "data": [
+            {
+                "name": "previousOwner",
+                "type": "felt"
+            },
+            {
+                "name": "newOwner",
+                "type": "felt"
+            }
+        ],
+        "keys": [],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "name": "name",
+                "type": "felt"
+            },
+            {
+                "name": "symbol",
+                "type": "felt"
+            },
+            {
+                "name": "owner",
+                "type": "felt"
+            },
+            {
+                "name": "token_addr",
+                "type": "felt"
+            }
+        ],
+        "name": "constructor",
+        "outputs": [],
+        "type": "constructor"
+    },
+    {
+        "inputs": [
+            {
+                "name": "account",
+                "type": "felt"
+            }
+        ],
+        "name": "balance_of",
+        "outputs": [
+            {
+                "name": "balance",
+                "type": "Uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "amount",
+                "type": "Uint256"
+            }
+        ],
+        "name": "wrap",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "amount",
+                "type": "Uint256"
+            }
+        ],
+        "name": "unwrap",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "recipient",
+                "type": "felt"
+            },
+            {
+                "name": "amount_per_second",
+                "type": "Uint256"
+            },
+            {
+                "name": "deposit_amount",
+                "type": "Uint256"
+            }
+        ],
+        "name": "start_stream",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "outflow_id",
+                "type": "felt"
+            },
+            {
+                "name": "amount_per_second",
+                "type": "Uint256"
+            }
+        ],
+        "name": "update_stream",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "outflow_id",
+                "type": "felt"
+            },
+            {
+                "name": "to_remove_amount",
+                "type": "Uint256"
+            }
+        ],
+        "name": "sender_remove_deposit",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "outflow_id",
+                "type": "felt"
+            },
+            {
+                "name": "to_add_amount",
+                "type": "Uint256"
+            }
+        ],
+        "name": "sender_add_deposit",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "outflow_id",
+                "type": "felt"
+            }
+        ],
+        "name": "cancel_stream",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "recipient",
+                "type": "felt"
+            },
+            {
+                "name": "amount",
+                "type": "Uint256"
+            }
+        ],
+        "name": "transfer",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "sender",
+                "type": "felt"
+            },
+            {
+                "name": "recipient",
+                "type": "felt"
+            },
+            {
+                "name": "amount",
+                "type": "Uint256"
+            }
+        ],
+        "name": "transfer_from",
+        "outputs": [],
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "user",
+                "type": "felt"
+            }
+        ],
+        "name": "get_all_outflow_streams_by_user",
+        "outputs": [
+            {
+                "name": "res_len",
+                "type": "felt"
+            },
+            {
+                "name": "res",
+                "type": "outflow*"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "user",
+                "type": "felt"
+            }
+        ],
+        "name": "get_all_inflow_streams_by_user",
+        "outputs": [
+            {
+                "name": "res_len",
+                "type": "felt"
+            },
+            {
+                "name": "res",
+                "type": "inflow*"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
+]

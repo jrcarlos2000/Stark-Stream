@@ -9,16 +9,11 @@ const {
   iterativelyCheckStatus,
 } = require("@shardlabs/starknet-hardhat-plugin/dist/src/types");
 const fs = require("fs");
-const ERC721_name = starknet.shortStringToBigInt("Carlos");
-const ERC721_symbol = starknet.shortStringToBigInt("CAR");
-const tokenDecimals = ethers.utils.parseUnits("1");
+
 let cAccount, cCore,cUserRegistry;
 
-const REGISTRY = "user_registry";
-const QFPOOL = "qf_pool";
-const CORE = "core";
-const GAS = "gas";
-const ERC20 = "MockErc20";
+const MTOKEN = "m_token";
+const TOKEN = "ERC20";
 
 const gasAddr = {
   devnet: "0x62230ea046a9a5fbc261ac77d03c8d41e5d442db2284587570ab46455fd2488",
@@ -46,60 +41,76 @@ describe("Deploying", function () {
         let account = (await starknet.devnet.getPredeployedAccounts())[0];
         cAccount = await starknet.getAccountFromAddress(account.address,account.private_key,'OpenZeppelin');
     }
+    //deploying dummy tokens
+    const cfToken = await starknet.getContractFactory(TOKEN);
+    const cToken1 = await cfToken.deploy({
+      name : stringToFelt("USDT"),
+      symbol : stringToFelt("USDT"),
+      initial_supply : {low : 0n, high : 0n},
+      recipient : BigInt(cAccount.address)
+    });
 
-    const cfUserRegistry = await starknet.getContractFactory(REGISTRY);
-    cUserRegistry = await cfUserRegistry.deploy();
-    const cfQFPool = await starknet.getContractFactory(QFPOOL);
-    const chQFPool = await cfQFPool.declare();
-    const cfCore = await starknet.getContractFactory(CORE);
-    const cfERC20 = await starknet.getContractFactory(ERC20);
-    cCore = await cfCore.deploy({
-      contract_hash: BigInt(chQFPool),
-      user_registrar_: cUserRegistry.address,
-      erc20_addr_: gasAddr[starknet.network],
-      admin: cAccount.address,
+    const cToken2 = await cfToken.deploy({
+      name : stringToFelt("DAI"),
+      symbol : stringToFelt("DAI"),
+      initial_supply : {low : 0n, high : 0n},
+      recipient : BigInt(cAccount.address)
+    });
+
+    const cToken3 = await cfToken.deploy({
+      name : stringToFelt("BTC"),
+      symbol : stringToFelt("BTC"),
+      initial_supply : {low : 0n, high : 0n},
+      recipient : BigInt(cAccount.address)
+    });
+
+    //deploying m_tokens
+
+    const cfMToken = await starknet.getContractFactory(MTOKEN);
+    const cMToken1 =  await cfMToken.deploy({
+      name : stringToFelt("mUSDT"), 
+      symbol : stringToFelt("mUSDT"),
+      owner : BigInt(cAccount.address),
+      token_addr : BigInt(cToken1.address)
+    });
+    const cMToken2 =  await cfMToken.deploy({
+      name : stringToFelt("mDAI"), 
+      symbol : stringToFelt("mDAI"),
+      owner : BigInt(cAccount.address),
+      token_addr : BigInt(cToken2.address)
+    });
+    const cMToken3 =  await cfMToken.deploy({
+      name : stringToFelt("mBTC"), 
+      symbol : stringToFelt("mBTC"),
+      owner : BigInt(cAccount.address),
+      token_addr : BigInt(cToken3.address)
     });
     try {
       fs.copyFileSync(
-        cfUserRegistry.abiPath,
-        `../frontend/src/abis/${REGISTRY}.json`
+        cfToken.abiPath,
+        `../frontend/src/abis/${TOKEN}.json`
       );
-      fs.copyFileSync(cfQFPool.abiPath, `../frontend/src/abis/${QFPOOL}.json`);
-      fs.copyFileSync(cfERC20.abiPath, `../frontend/src/abis/${ERC20}.json`);
-      fs.copyFileSync(cfCore.abiPath, `../frontend/src/abis/${CORE}.json`);
+      fs.copyFileSync(
+        cfMToken.abiPath,
+        `../frontend/src/abis/${MTOKEN}.json`
+      );
     } catch (err) {
       console.error(err);
     }
     let contractAddresses = {};
-    contractAddresses[REGISTRY] = cUserRegistry.address;
-    contractAddresses[CORE] = cCore.address;
-    contractAddresses[GAS] = gasAddr[starknet.network];
+    contractAddresses['USDT'] = cToken1.address;
+    contractAddresses['DAI'] = cToken2.address;
+    contractAddresses['BTC'] = cToken3.address;
+    contractAddresses['mUSDT'] = cMToken1.address;
+    contractAddresses['mDAI'] = cMToken2.address;
+    contractAddresses['mBTC'] = cMToken3.address;
 
     console.log(contractAddresses);
     const data = JSON.stringify(contractAddresses);
     try {
-      fs.writeFileSync("../frontend/src/utils/contractAddresses.json", data);
+      fs.writeFileSync("../frontend/src/utils/addresses.json", data);
     } catch (err) {
       console.error(err);
     }
-  });
-  it("Deploy 2 Pools by admin", async function () {
-    await cAccount.invoke(cCore,'deploy_pool',{
-        vote_start_time_ : 0n,
-        vote_end_time_: 99990000000000n,
-        stream_start_time_ : 999999999991111111n,
-        stream_end_time_: 99999999999111111n
-    });
-
-    await cAccount.invoke(cCore,'deploy_pool',{
-        vote_start_time_ : 0n,
-        vote_end_time_: 99990000000000n,
-        stream_start_time_ : 999999999991111111n,
-        stream_end_time_: 99999999999111111n
-    });
-
-    const currPoolId = await cCore.call('get_current_pool_length');
-    console.log('currently %s pools deployed', currPoolId.res);
-
   });
 });
