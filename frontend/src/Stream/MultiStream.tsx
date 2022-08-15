@@ -77,22 +77,21 @@ const StreamingCard: FC<{ mode: string, _streamType: string, txData: IDetailBrea
     console.log("test all data ", allVal)
   }
 
-  console.log(transactions);
 
   const handleSubmit = async (values: any) => {
     const Account = await connectors[0].account();
     const UnitsPerSecond = parseEther(values.flowrate.value).div(timeInSeconds[values.flowrate.unit])//format if unit is more than second
     const parsedDeposit = parseEther('1');
-    // await Account.execute([
-    //   {
-    //     contractAddress: contracts[values.token] ? contracts[values.token].address : '',
-    //     entrypoint: 'start_stream',
-    //     calldata: [values.receiver,UnitsPerSecond.toString(),'0',parsedDeposit.toString(),'0'],
-    //   }
-    // ])
-    await callStartStream({
-      args : [values.receiver, bnToUint256(UnitsPerSecond.toString()), bnToUint256(parsedDeposit.toString())]
-    })
+    await Account.execute([
+      {
+        contractAddress: contracts[values.token] ? contracts[values.token].address : '',
+        entrypoint: 'start_stream',
+        calldata: [values.receiver,UnitsPerSecond.toString(),'0',parsedDeposit.toString(),'0'],
+      }
+    ])
+    // await callStartStream({
+    //   args : [values.receiver, bnToUint256(UnitsPerSecond.toString()), bnToUint256(parsedDeposit.toString())]
+    // })
     notification.open({
       message: 'Transaction Submitted',
       description:
