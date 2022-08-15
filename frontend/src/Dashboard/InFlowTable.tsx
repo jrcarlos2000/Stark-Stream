@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 Modal.setAppElement("#__next");
 import { useEffect, useState } from "react";
 import { useStarknet, useStarknetCall } from "@starknet-react/core";
-import { usemBTCContract, useUSDTContract, usemDAIContract, usemUSDTContract } from "../hooks/TokenContracts";
+// import { usemBTCContract, useUSDTContract, usemDAIContract, usemUSDTContract } from "../hooks/TokenContracts";
 import { parseTokenData } from "../utils/core";
 
 import Table from "./Table";
