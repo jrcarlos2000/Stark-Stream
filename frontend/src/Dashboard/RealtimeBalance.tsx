@@ -15,15 +15,14 @@ export const RealtimeBalance: FC<IRealtimeBalanceProps> = (props) => {
     
     useEffect(() => {
         // sometimes props get unwanted updated
-        if (!props.flowrate) return
+        // if (!props.flowrate) return
 
         const intervalFlowrate = props.flowrate * (updateInterval * scaleTimeToSec);
 
         const sti = setInterval(() => {
             const timeElapsed = Date.now() - props.startTime;
             const newBal = intervalFlowrate * timeElapsed + props.staticBalance;
-            const parsedNewBal = formatEther(newBal);
-            setRealtimeBal(parseFloat(parsedNewBal));
+            setRealtimeBal(newBal);
         }, updateInterval)
 
         return () => clearInterval(sti);

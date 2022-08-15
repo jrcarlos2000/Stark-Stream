@@ -4,124 +4,90 @@ import { useRouter } from "next/router";
 Modal.setAppElement("#__next");
 import { useEffect, useMemo, useState } from "react";
 import { useStarknet, useStarknetCall } from "@starknet-react/core";
-import {
-  useMBTCContract,
-  useUSDTContract,
-  useMDAIContract,
-  useMUSDTContract,
-} from "../hooks/TokenContracts";
+import { useMDAIContract, useUSDTContract, useMUSDTContract, useMBTCContract } from "../hooks/TokenContracts";
 import { readListOfStreams } from "../utils/core";
-import { Button } from "antd";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import Table from "./Table";
 import { createColumnHelper } from "@tanstack/react-table";
 import { IRealtimeBalanceProps, RealtimeBalance } from "./RealtimeBalance";
 import ColoredFlowrate from "./ColoredFlowrate";
 
 export type IOutFlowTableData = {
-  id: number;
-  to: string;
-  flowrate: number;
-  balance: IRealtimeBalanceProps;
-  stop: boolean;
-  update: any;
+    id: number;
+    to: string;
+    flowrate: number;
+    balance: number;
+    stop: boolean;
+    update: any;
 };
 
 const columnHelper = createColumnHelper<IOutFlowTableData>();
 
-export default function OutFlowTable({
-  selectedToken,
-}: {
-  selectedToken: string;
-}) {
-  const router = useRouter();
-  // CONTRACT INVOKES
-  const [data, setData] = useState<any>([]);
-  const handleStop = (selectedToken: string, streamId: number) => {};
-  const handleUpdate = (selectedToken: string, streamId: number) => {
-    router.push(
-      `/stream?update&streamType=Direct&token=${selectedToken}&id=${streamId}`
+export default function OutFlowTable({selectedToken}: {selectedToken: string}) {
+    // CONTRACT INVOKES
+    const [data, setData] = useState<any>([]);
+    const handleStop = (streamId: number) => {}
+    const handleUpdate = (streamId: number) => {}
+    const {connectors,account} = useStarknet();
+    const {contract : cmBTC} = useMBTCContract();
+    const {contract : cmDAI} = useMDAIContract();
+    const {contract : cmUSDT} = useMUSDTContract();
+  
+    const contracts : any = {
+      'mUSDT' : cmUSDT,
+      'mBTC' : cmBTC,
+      'mDAI' : cmDAI 
+    }
+
+    // console.log(selectedToken);
+
+    // FETCH DATA: Outflow data of selectedToken of current user
+
+    useEffect(() => { //update balances
+        const interval = setInterval(() => {
+            readListOfStreams(contracts[selectedToken],account).then((data) => {
+                setData(data);
+            })
+        }, 6000);
+        return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+      }, [selectedToken])
+
+    console.log('debugging outflow table', selectedToken);
+
+    // PREPARE COLUMN
+    const columns = useMemo(() => [
+        columnHelper.accessor("to", {
+            header: "To",
+            cell: (info) => <strong>{info.getValue()}</strong>,
+        }),
+        columnHelper.accessor("flowrate", {
+            header: "Flow rate",
+            cell: (info) => <ColoredFlowrate flowrate={info.getValue()} />,
+        }),
+        columnHelper.accessor("balance", {
+            header: "Balance",
+            cell: (info) => <strong>{info.getValue()}</strong>,
+        }),
+        columnHelper.accessor("id", {
+            header: "Stop",
+            cell: (info) => {
+                const streamId = info.row.original.id
+                return <Button onClick={() => handleStop(streamId)}>stop</Button>
+            }
+        }),
+        columnHelper.accessor("id", {
+            header: "Updat",
+            cell: (info) => {
+                const streamId = info.row.original.id
+                return <Button onClick={() => handleUpdate(streamId)}>update</Button>
+            },
+        }),
+    ], [columnHelper, handleStop, handleUpdate]);
+
+    return (
+        <Table title={`Outflow Tokens: ${selectedToken}`} columns={columns} data={data} />
     );
-  };
-  const { connectors, account } = useStarknet();
-  const { contract: cmBTC } = useMBTCContract();
-  const { contract: cmDAI } = useMDAIContract();
-  const { contract: cmUSDT } = useMUSDTContract();
 
-  const contracts: any = {
-    mUSDT: cmUSDT,
-    mBTC: cmBTC,
-    mDAI: cmDAI,
-  };
 
-  // FETCH DATA: Outflow data of selectedToken of current user
-
-  useEffect(() => {
-    //update balances
-    const interval = setInterval(() => {
-      readListOfStreams(contracts[selectedToken], account).then((data: any) => {
-        setData(data);
-      });
-    }, 6000);
-    return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
-  }, []);
-
-  console.log("debugging outflow table", selectedToken);
-
-  // PREPARE COLUMN
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor("to", {
-        header: "TO",
-        cell: (info) => <strong>{info.getValue()}</strong>,
-      }),
-      columnHelper.accessor("flowrate", {
-        header: "FLOW RATE / sec",
-        cell: (info) => <ColoredFlowrate flowrate={info.getValue()} />,
-      }),
-      columnHelper.accessor("balance", {
-        header: "BALANCE",
-        cell: (info) => <RealtimeBalance {...info.getValue()} />,
-      }),
-      columnHelper.accessor("id", {
-        header: "STOP",
-        cell: (info) => {
-          const streamId = info.row.original.id;
-          return (
-            <Button
-              type="primary"
-              onClick={() => handleStop(selectedToken, streamId)}
-              shape="circle"
-              icon={<DeleteOutlined />}
-            />
-          );
-        },
-      }),
-      columnHelper.accessor("id", {
-        header: "UPDATE",
-        cell: (info) => {
-          const streamId = info.row.original.id;
-          return (
-            <Button
-              type="primary"
-              onClick={() => handleUpdate(selectedToken, streamId)}
-              shape="circle"
-              icon={<EditOutlined />}
-            />
-          );
-        },
-      }),
-    ],
-    [columnHelper, selectedToken, handleStop, handleUpdate]
-  );
-
-  return (
-    <Table
-      title={`Outflow Tokens: ${selectedToken}`}
-      columns={columns}
-      data={data}
-    />
-  );
 }
 
 const Wrapper = styled.div``;
@@ -132,8 +98,8 @@ const MainContainer = styled.div`
   margin-top: 5rem;
 `;
 
-// const Button = styled.button`
-//   &:hover {
-//     cursor: pointer;
-//   }
-// `;
+const Button = styled.button`
+  &:hover {
+    cursor: pointer;
+  }
+`;

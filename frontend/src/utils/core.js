@@ -1,15 +1,18 @@
+import { BigNumber, ethers } from "ethers";
 import { formatEther } from "ethers/lib/utils";
 import { bnToUint256, uint256ToBN } from "starknet/dist/utils/uint256";
 import { toBN, toHex } from "starknet/utils/number";
 
 export async function parseTokenData(mUSTBalance, mDAIBalance, mBTCBalance){
+
+    // console.log('debugging balances',mUSTBalance, mDAIBalance, mBTCBalance );
     //perform other operations here
     return [{
         asset: "mUSDT",
         balance: {
           startTime: Date.now(),
           flowrate: 0,
-          staticBalance: uint256ToBN(mUSTBalance[0])
+          staticBalance: parseFloat(formatEther((uint256ToBN(mUSTBalance[0])).toString()))
         },
         netFlow: 10,
         inflow: "done",
@@ -20,7 +23,7 @@ export async function parseTokenData(mUSTBalance, mDAIBalance, mBTCBalance){
         balance: {
           startTime: Date.now(),
           flowrate: 0,
-          staticBalance: uint256ToBN(mDAIBalance[0])
+          staticBalance: parseFloat(formatEther((uint256ToBN(mBTCBalance[0])).toString()))
         },
         netFlow: -19,
         inflow: "done",
@@ -31,7 +34,7 @@ export async function parseTokenData(mUSTBalance, mDAIBalance, mBTCBalance){
         balance: {
           startTime: Date.now(),
           flowrate: 0,
-          staticBalance: uint256ToBN(mBTCBalance[0])
+          staticBalance: parseFloat(formatEther((uint256ToBN(mDAIBalance[0])).toString()))
         },
         netFlow: 72,
         inflow: "done",
@@ -79,6 +82,7 @@ function shortenAddress (address) {
 export async function readListOfStreams(contract,account) {
 
     let data = [];
+    console.log('debugging readList of streams',contract,account);
     try{
         let res = (await contract.get_all_outflow_streams_by_user(toBN(account)))[0];
         console.log('debugging readList of streams',res);
@@ -86,12 +90,13 @@ export async function readListOfStreams(contract,account) {
             data.push({
                 id : i + 1,
                 to : shortenAddress(toHex(toBN(res[i].to)).toString()),
-                flowrate : formatEther(uint256ToBN(res[i].amount_per_second).toString()),
+                flowrate : -1.0 * parseFloat(formatEther(uint256ToBN(res[i].amount_per_second).toString())),
                 balance : formatEther(uint256ToBN(res[i].deposit).toString()),
                 stop : true,
                 update : true
             })
         }
+        console.log(data);
         return data;
     }catch(e){
         console.log(e)

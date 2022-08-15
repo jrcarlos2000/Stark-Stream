@@ -79,15 +79,23 @@ export default function InFlowTable({
   useEffect(() => {
     async function AsyncFn() {
       if (
-        true
+        mBTC_balance_result &&
+        mBTC_balance_result.length > 0 &&
+        mUSDT_balance_result &&
+        mUSDT_balance_result.length > 0 &&
+        mDAI_balance_result &&
+        mDAI_balance_result.length > 0
       ) {
-        setData(
-          await parseTokenData(
+
+        let new_data = await parseTokenData(
             mUSDT_balance_result,
             mDAI_balance_result,
             mBTC_balance_result
-          )
+          ) 
+        setData(
+            new_data
         );
+        console.log('debugging balances',new_data);
       }
     }
     AsyncFn();

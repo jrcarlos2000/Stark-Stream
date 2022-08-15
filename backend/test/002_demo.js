@@ -79,6 +79,8 @@ describe("demo Scripts", function () {
       });
     }
 
+    // await starknet.devnet.increaseTime(559756);
+
     let addressesFile = fs.readFileSync('../frontend/src/utils/addresses.json');
     let addresses = JSON.parse(addressesFile);
 
@@ -86,7 +88,7 @@ describe("demo Scripts", function () {
     const cfToken = await starknet.getContractFactory(TOKEN);
     const cUSDT = await cfToken.getContractAt(addresses[USDT]);
     
-    for(let i = 0 ;;i++){
+    for(let i=0;;i++){
       await cAccount.invoke(cUSDT,'faucet',{});
     }
 
