@@ -1,15 +1,30 @@
 import styled from "styled-components";
 import Image from "next/image";
+import { useState } from "react";
 
-export default function Token({ token }: any) {
+export default function Token({
+  token,
+  action,
+  selectedToken,
+  setSelectedToken,
+  setIsModalOpen,
+}: any) {
+  const handleClick = () => {
+    setSelectedToken(token.name);
+    setIsModalOpen(false);
+  };
   return (
-    <Wrapper>
+    <Wrapper onClick={handleClick}>
       <Flex>
         <ImageContainer>
           <Image width="35px" height="35px" src={token.image} alt="" />
         </ImageContainer>
         <NameContainer>
-          <Name>{token.name}</Name>
+          {action === "wrap" ? (
+            <Name>{token.name}</Name>
+          ) : (
+            <Name>{token.name}x</Name>
+          )}
           <Description>{token.description}</Description>
         </NameContainer>
       </Flex>

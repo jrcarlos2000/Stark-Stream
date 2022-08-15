@@ -2,30 +2,49 @@ import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 import styled from "styled-components";
-import GlowingContainer, { ITxData } from "../src/Stream/GlowingContainer";
+import { IDetailBreakdownMulti, IDetailBreakdownSingle } from "../src/Stream/DetailBreakdown";
+import MultiStream from "../src/Stream/MultiStream";
 
 const Send: NextPage = () => {
   const router = useRouter();
 
   // stream SEND and UPDATE all go through this component
   const query = useMemo(() => {
+    console.log(router.query)
     if (router.query.hasOwnProperty("update")) {
       // fetch streaming data from contract
       // test data
-      const updateData: ITxData = {
+      const updateDataSingle: IDetailBreakdownSingle = {
         receiver: "0x999",
         token: "USDC",
-        flowrate: 0.666,
-        endsOn: 0,
+        flowrate: {
+          value: 0.666,
+          unit: "second"
+        },
+      }
+      const updateDataMulti: IDetailBreakdownMulti = {
+        receivers: [
+          {addr: "0x123", perc: 20},
+          {addr: "0x456", perc: 80}
+        ],
+        token: "USDC",
+        flowrate: {
+          value: 0.666,
+          unit: "second"
+        },
       }
       return {
         mode: "Update",
-        txData: updateData
+        _streamType: router.query.streamType as string,
+        txData: updateDataMulti
       }
     } else {
       return {
         mode: "Send",
-        txData: null
+        _streamType: "Direct",
+        txData: {
+          flowrate: {unit: "second"}
+        }
       }
     }
   }, [router.query])
@@ -33,7 +52,7 @@ const Send: NextPage = () => {
   return (
     <Wrapper>
       <MainContainer>
-        <GlowingContainer {...query} />
+        <MultiStream {...query} />
       </MainContainer>
     </Wrapper>
   );

@@ -1,17 +1,20 @@
 import styled from "styled-components";
 import { AiOutlineArrowDown } from "react-icons/ai";
 import { IoIosArrowDown } from "react-icons/io";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import TokenSelectorModal from "./TokenSelectorModal";
 import Modal from "react-modal";
 Modal.setAppElement("#__next");
+import { BigNumber, utils } from "ethers";
+import { FormInput } from "../components/common/FormInput";
 
-export default function Wrap() {
-  const [amount, setAmount] = useState("0.0");
+export default function Wrap({ action }: { action: any }) {
+  const [ref, setRef] = useState();
   const [balance, setBalance] = useState("0");
   const [selectedToken, setSelectedToken] = useState("DAI");
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [value, setValue] = useState<any>();
+  const [parsedValue, setParsedValue] = useState<any>();
   const customStyles = {
     content: {
       top: "50%",
@@ -30,14 +33,26 @@ export default function Wrap() {
     },
   };
 
+  const onChangeValue = (e: any) => {
+    if (e.target.value.toString() != "") {
+      setRef(e.target.value.toString());
+      setParsedValue(utils.parseEther(e.target.value.toString()));
+    }
+  };
+
+  console.log(parsedValue);
   return (
     <Wrapper>
       <MainContainer>
         <WrappingBox>
-          <Amount>{amount}</Amount>
+          <AmountFormInput
+            placeholder="0.0"
+            value={value}
+            onChange={onChangeValue}
+          />
           <TokenContainer>
             <TokenSelector onClick={() => setIsModalOpen(true)}>
-              <p>token</p>
+              <p>{selectedToken}</p>
               <IoIosArrowDown />
             </TokenSelector>
             <BalanceContainer>
@@ -48,7 +63,7 @@ export default function Wrap() {
         </WrappingBox>
         <AiOutlineArrowDown className="icon" />
         <WrappingBox>
-          <Amount>{amount}</Amount>
+          <AmountFormInput placeholder="0.0" value={ref} />
           <TokenContainer>
             <Token>{selectedToken}x</Token>
             <Balance>Balance: {balance}</Balance>
@@ -57,13 +72,18 @@ export default function Wrap() {
       </MainContainer>
       <Unit>1 ETH = 1 ETHx</Unit>
       <Button>Upgrade to Super Token</Button>
-
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
         style={customStyles}
       >
-        <TokenSelectorModal setIsModalOpen={setIsModalOpen} />
+        <TokenSelectorModal
+          selectedToken={selectedToken}
+          setSelectedToken={setSelectedToken}
+          action={action}
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+        />
       </Modal>
     </Wrapper>
   );
@@ -99,9 +119,7 @@ const WrappingBox = styled.div`
   justify-content: space-between;
 `;
 
-const Amount = styled.div`
-  font-size: 1.8rem;
-`;
+const AmountFormInput = styled(FormInput)``;
 
 const TokenContainer = styled.div`
   display: flex;

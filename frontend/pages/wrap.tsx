@@ -5,9 +5,7 @@ import WrapContainer from "../src/Wrap/WrapContainer";
 const Wrap: NextPage = () => {
   return (
     <Wrapper>
-      <MainContainer>
         <WrapContainer />
-      </MainContainer>
     </Wrapper>
   );
 };
@@ -20,4 +18,3 @@ const Wrapper = styled.div`
   margin-top: 5rem;
 `;
 
-const MainContainer = styled.div``;

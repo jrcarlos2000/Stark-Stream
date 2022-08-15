@@ -4,7 +4,7 @@ import { InboxOutlined } from "@ant-design/icons";
 import { createContext, FC, useMemo, useState } from "react";
 import TokenSelector from "./TokenSelector";
 import FlowrateEditor from "./FlowrateEditor";
-import DetailBreakdown, { IDetails } from "./DetailBreakdown";
+import DetailBreakdown, { IDetailBreakdownSingle } from "./DetailBreakdown";
 
 export interface ITxData {
   receiver: string,

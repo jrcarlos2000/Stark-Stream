@@ -131,6 +131,12 @@ const MainContainer = styled.div`
   border: 1px solid #aeaeaf;
   border-radius: 10px;
   padding: 2rem;
+  
+  background-color: #391E5A;
+  border-radius: 20px;
+  box-shadow: rgb(204 204 204 / 55%) 0px 0px 6px 3px;
+  border: 2px solid #80b8c2;
+  // padding: 28px;
 `;
 
 const Row = styled.tr`

@@ -55,7 +55,7 @@ const FlowrateEditor: FC<IFlowrateEditor> = ({ flowrate, setFlowrate }) => {
                 <Input placeholder="Flow Rate" type="number" value={value} onInput={e => setValue(Number.parseFloat(e.target.value))} />
             </Col>
             <Col span={8}>
-                <Select defaultValue="s" style={{ width: 120 }} onChange={setUnit}>
+                <Select style={{ width: 120 }} onChange={setUnit}>
                     {Object.keys(flowrateUnits).map(key =>
                         <Option key={key} value={key}>{flowrateUnits[key].display}</Option>
                     )}

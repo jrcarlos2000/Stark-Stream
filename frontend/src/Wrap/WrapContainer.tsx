@@ -16,9 +16,9 @@ export default function WrapContainer() {
 
   const renderLogic = () => {
     if (action === "wrap") {
-      return <Wrap />;
+      return <Wrap action={action} />;
     } else if (action === "unwrap") {
-      return <Unwrap />;
+      return <Unwrap action={action} />;
     }
   };
   return (
