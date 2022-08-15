@@ -107,8 +107,19 @@ export default function Wrap({ action }: { action: any }) {
         entrypoint: "approve",
         calldata: [
           mcontracts[selectedToken].address,
+          "0",
+          "0",
+        ],
+      },
+      {
+        contractAddress: contracts[selectedToken]
+          ? contracts[selectedToken].address
+          : "",
+        entrypoint: "approve",
+        calldata: [
+          mcontracts[selectedToken].address,
           parsedValue.toString(),
-          String(0),
+          "0",
         ],
       },
       {
@@ -116,11 +127,10 @@ export default function Wrap({ action }: { action: any }) {
           ? mcontracts[selectedToken].address
           : "",
         entrypoint: "wrap",
-        calldata: [parsedValue.toString(), String(0)],
+        calldata: [parsedValue.toString(), '0'],
       },
     ]);
-
-    setButtonMsg("Upgrade to Super Token");
+    setButtonMsg("Upgrade to M Token");
   };
   const onChangeValue = (e: any) => {
     if (e.target.value.toString() != "") {

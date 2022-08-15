@@ -198,10 +198,6 @@
             {
                 "name": "amount",
                 "type": "Uint256"
-            },
-            {
-                "name": "to_address",
-                "type": "felt"
             }
         ],
         "name": "wrap",

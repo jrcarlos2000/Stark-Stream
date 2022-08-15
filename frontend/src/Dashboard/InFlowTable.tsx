@@ -3,7 +3,7 @@ import Modal from "react-modal";
 import { useRouter } from "next/router";
 Modal.setAppElement("#__next");
 import { useEffect, useState } from "react";
-import { useStarknet, useStarknetCall } from "@starknet-react/core";
+import { useStarknet, useStarknetCall, useStarknetTransactionManager } from "@starknet-react/core";
 import { useMBTCContract, useMUSDTContract, useMDAIContract } from "../hooks/TokenContracts";
 import { parseTokenData } from "../utils/core";
 
@@ -51,6 +51,7 @@ export default function InFlowTable({ handleExpand }: { handleExpand: (row: any)
     const { contract: cmBTC } = useMBTCContract();
     const { contract: cmDAI } = useMDAIContract();
     const { contract: cmUSDT } = useMUSDTContract();
+    const {transactions} = useStarknetTransactionManager();
     const [data, setData] = useState<any>({});
 
     const { data: mBTC_balance_result } = useStarknetCall({
@@ -81,7 +82,10 @@ export default function InFlowTable({ handleExpand }: { handleExpand: (row: any)
             }
         }
         AsyncFn();
-    }, [mBTC_balance_result, mUSDT_balance_result, mDAI_balance_result])
+    }, [mBTC_balance_result, mUSDT_balance_result, mDAI_balance_result]);
+
+    console.log('debugging dashboard', data, transactions);
+    console.log('debugging dashboard', mUSDT_balance_result);
 
     return (
         <Table title="Inflow Tokens" columns={columns} data={data} handleExpand={handleExpand} />

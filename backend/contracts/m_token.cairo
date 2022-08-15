@@ -147,6 +147,7 @@ func wrap{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
     with_attr error_message("Wrapping failed, cannot transfer ERC20 to contract."):
         assert transfer_res = 1
     end
+    ERC20._mint(caller, amount)
     return ()
 end
 

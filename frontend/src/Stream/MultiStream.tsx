@@ -6,7 +6,7 @@ import TokenSelector from "./TokenSelector";
 import FlowrateEditor from "./FlowrateEditor";
 import DetailBreakdown, { IDetailBreakdownMulti, IDetailBreakdownSingle } from "./DetailBreakdown";
 import { SEC } from "../constants";
-// import { usemBTCContract,useUSDTContract, usemDAIContract, usemUSDTContract } from "../hooks/TokenContracts";
+import { useMBTCContract, useMUSDTContract, useMDAIContract } from "../hooks/TokenContracts";
 import Link from "next/link";
 import { useStarknet, useStarknetInvoke, useStarknetTransactionManager } from "@starknet-react/core";
 import { parseEther } from "ethers/lib/utils";
@@ -50,9 +50,9 @@ const StreamingCard: FC<{ mode: string, _streamType: string, txData: IDetailBrea
   const [detailData, setDetailData] = useState<any>();
   const {connectors} = useStarknet();
   const {transactions} = useStarknetTransactionManager();
-  const {contract : cmBTC} = usemBTCContract();
-  const {contract : cmDAI} = usemDAIContract();
-  const {contract : cmUSDT} = usemUSDTContract();
+  const {contract : cmBTC} = useMBTCContract();
+  const {contract : cmDAI} = useMDAIContract();
+  const {contract : cmUSDT} = useMUSDTContract();
   const {invoke : callStartStream} = useStarknetInvoke({
     contract : cmUSDT,
     method : 'start_stream'
