@@ -147,8 +147,6 @@ func wrap{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
     with_attr error_message("Wrapping failed, cannot transfer ERC20 to contract."):
         assert transfer_res = 1
     end
-
-    ERC20._mint(caller, amount)
     return ()
 end
 
@@ -195,6 +193,7 @@ func start_stream{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_
 
     # transfer mToken from user to this contract address, this will be our deposit
     let (this_contract) = get_contract_address()
+    ERC20.approve(spender=caller, amount=deposit_amount)
     ERC20.transfer_from(caller, this_contract, deposit_amount)
 
     let _inflow = inflow(
@@ -523,3 +522,23 @@ func get_all_inflow_streams_by_user_internal{syscall_ptr : felt*, pedersen_ptr :
     return (inflows_len, inflows)
 end
 
+@external
+func approve{
+        syscall_ptr : felt*, 
+        pedersen_ptr : HashBuiltin*,
+        range_check_ptr
+    }(spender: felt, amount: Uint256) -> (success: felt):
+    ERC20.approve(spender=spender, amount=amount)
+    # Cairo equivalent to 'return (true)'
+    return (1)
+end
+
+@view
+func allowance{
+        syscall_ptr : felt*, 
+        pedersen_ptr : HashBuiltin*,
+        range_check_ptr
+    }(owner: felt, spender: felt) -> (allowance : Uint256):
+    let (allowance) = ERC20.allowance(owner,spender)
+    return (allowance)
+end

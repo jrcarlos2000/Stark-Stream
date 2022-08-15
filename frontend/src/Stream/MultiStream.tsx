@@ -6,11 +6,23 @@ import TokenSelector from "./TokenSelector";
 import FlowrateEditor from "./FlowrateEditor";
 import DetailBreakdown, { IDetailBreakdownMulti, IDetailBreakdownSingle } from "./DetailBreakdown";
 import { SEC } from "../constants";
+import { usemBTCContract,useUSDTContract, usemDAIContract, usemUSDTContract } from "../hooks/TokenContracts";
 import Link from "next/link";
+import { useStarknet, useStarknetInvoke, useStarknetTransactionManager } from "@starknet-react/core";
+import { parseEther } from "ethers/lib/utils";
+import { bnToUint256 } from "starknet/dist/utils/uint256";
+import { toBN } from "starknet/dist/utils/number";
 ///////
 // token selector
 const { Option } = Select;
-const tokenList: String[] = ["WETH", "BTC", "USDC"]
+const timeInSeconds : any = {
+  'second' : 1,
+  'min' : 60,
+  'hour' : 3600,
+  'day' : 86400,
+  'month' : 2592000
+};
+const tokenList: String[] = ["mDAI", "mUSDT", "mBTC"]
 // flowrate editor
 interface IFlowrateUnit {
   display: string,
@@ -36,6 +48,22 @@ const StreamingCard: FC<{ mode: string, _streamType: string, txData: IDetailBrea
 
   const [streamType, setStreamType] = useState<string>(_streamType || "Direct");
   const [detailData, setDetailData] = useState<any>();
+  const {connectors} = useStarknet();
+  const {transactions} = useStarknetTransactionManager();
+  const {contract : cmBTC} = usemBTCContract();
+  const {contract : cmDAI} = usemDAIContract();
+  const {contract : cmUSDT} = usemUSDTContract();
+  const {invoke : callStartStream} = useStarknetInvoke({
+    contract : cmUSDT,
+    method : 'start_stream'
+  })
+
+  const contracts : any = {
+    'mUSDT' : cmUSDT,
+    'mBTC' : cmBTC,
+    'mDAI' : cmDAI 
+  }
+
   useEffect(() => setStreamType(_streamType), [_streamType])
 
   const disableEdit = mode == "Update";
@@ -49,9 +77,22 @@ const StreamingCard: FC<{ mode: string, _streamType: string, txData: IDetailBrea
     console.log("test all data ", allVal)
   }
 
-  const handleSubmit = (values: any) => {
-    console.log(values);
+  console.log(transactions);
 
+  const handleSubmit = async (values: any) => {
+    const Account = await connectors[0].account();
+    const UnitsPerSecond = parseEther(values.flowrate.value).div(timeInSeconds[values.flowrate.unit])//format if unit is more than second
+    const parsedDeposit = parseEther('1');
+    // await Account.execute([
+    //   {
+    //     contractAddress: contracts[values.token] ? contracts[values.token].address : '',
+    //     entrypoint: 'start_stream',
+    //     calldata: [values.receiver,UnitsPerSecond.toString(),'0',parsedDeposit.toString(),'0'],
+    //   }
+    // ])
+    await callStartStream({
+      args : [values.receiver, bnToUint256(UnitsPerSecond.toString()), bnToUint256(parsedDeposit.toString())]
+    })
     notification.open({
       message: 'Transaction Submitted',
       description:

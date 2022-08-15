@@ -1,5 +1,6 @@
 // const { ArgentAccount } = require( "hardhat/types");
 const { starknet, ethers } = require("hardhat");
+const {parseEther} = require("ethers/lib/utils");
 const {NFTStorage , Blob} = require('nft.storage');
 const axios = require("axios").default;
 const fs = require('fs');
@@ -100,7 +101,64 @@ describe("demo Scripts", function () {
       to_address : BigInt(accountsToFund[0])
     });
 
-    console.log('funding Accounts ... DONE ✅');
+    //DELETE : 
+    // await cAccount.invoke(cUSDT,'dummy_mint',{
+    //   to_address : BigInt(cAccount.address),
+    // });
+    // console.log('done here');
+    // const balance = await cUSDT.call('balanceOf',{
+    //   account : BigInt(cAccount.address),
+    // });
+    // console.log(balance);
+    // console.log(BigInt(parseEther('50')));
+    // await cAccount.invoke(cUSDT,'approve',{
+    //   spender : BigInt(cmUSDT.address),
+    //   amount : {low : 0n , high : 0n}
+    // });
+    // await cAccount.invoke(cUSDT,'approve',{
+    //   spender : BigInt(cmUSDT.address),
+    //   amount : {low : BigInt(parseEther('10')) , high : 0n}
+    // });
+    // console.log('done here');
+    // await cAccount.invoke(cmUSDT,'wrap',{
+    //   amount : {low : BigInt(parseEther('10')) , high : 0n},
+    //   to_address : BigInt(accountsToFund[0])
+    // });
+
+    // console.log('done here');
+    //DELETE trial for starting stream
+
+    // await cAccount.invoke(cmUSDT,'approve',{
+    //   spender : BigInt(cmUSDT.address),
+    //   amount : {low : 0n , high : 0n},
+    // });
+
+    // await cAccount.invoke(cmUSDT,'approve',{
+    //   spender : BigInt(cmUSDT.address),
+    //   amount : {low : BigInt(parseEther('10')) , high : 0n},
+    // });
+
+    // console.log('done approval');
+
+    // const allowances = await cmUSDT.call('allowance',{
+    //   owner : BigInt(cAccount.address),
+    //   spender : BigInt(cmUSDT.address)
+    // })
+
+    // console.log(allowances)
+
+    // await cAccount.invoke(cmUSDT,'start_stream',{
+    //   recipient : BigInt(accountsToFund[0]),
+    //   amount_per_second : {low : BigInt(parseEther("1")), high : 0n},
+    //   deposit_amount : {low : BigInt(parseEther('1')) , high : 0n},
+    // });
+
+    // const allOut = await cmUSDT.call('get_all_outflow_streams_by_user',{
+    //   user : BigInt(cAccount.address)
+    // })
+    // console.log(allOut.res[0].amount_per_second);
+
+    // console.log('funding Accounts ... DONE ✅');
 
 }); 
 });
