@@ -1,14 +1,10 @@
 import styled from "styled-components";
 import Modal from "react-modal";
-import { useRouter } from "next/router";
 Modal.setAppElement("#__next");
 import { useEffect, useState } from "react";
-import TokenTable, { TokenData } from "./TokenTable";
 import { useStarknet, useStarknetCall } from "@starknet-react/core";
-import { parseTokenData } from "../utils/core";
 import InFlowTable from "./InFlowTable";
 import OutFlowTable from "./OutFlowTable";
-// import { useMBTCContract, useMUSDTContract, useMDAIContract } from "../hooks/TokenContracts";
 import {
   useMBTCContract,
   useUSDTContract,
@@ -17,13 +13,12 @@ import {
 } from "../hooks/TokenContracts";
 
 export default function DashboardTable() {
-
   const [selectedToken, setSelectedToken] = useState<string>("mBTC");
   const handleExpand = (row: any) => {
     const selectedToken = row.original.asset;
     console.log("selected token: ", selectedToken);
-    setSelectedToken(selectedToken);  // remove the leading "m"
-  }
+    setSelectedToken(selectedToken); // remove the leading "m"
+  };
   const { account } = useStarknet();
   const { contract: cmBTC } = useMBTCContract();
   const { contract: cmDAI } = useMDAIContract();

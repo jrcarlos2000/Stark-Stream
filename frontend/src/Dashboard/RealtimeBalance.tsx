@@ -14,6 +14,9 @@ export const RealtimeBalance: FC<IRealtimeBalanceProps> = (props) => {
     const [realtimeBal, setRealtimeBal] = useState<number>(0);
     
     useEffect(() => {
+        // sometimes props get unwanted updated
+        if (!props.flowrate) return
+
         const intervalFlowrate = props.flowrate * (updateInterval * scaleTimeToSec);
 
         const sti = setInterval(() => {

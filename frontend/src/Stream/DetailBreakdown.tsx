@@ -8,7 +8,7 @@ export interface IDetailBreakdownSingle {
     token: string,
     flowrate: {
         value: number,
-        unit: string
+        unit: string    // by default this should be "/ second"
     },
 };
 
