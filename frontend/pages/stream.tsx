@@ -47,7 +47,12 @@ const Send: NextPage = () => {
         mode: "Send",
         _streamType: "Direct",
         txData: {
-          flowrate: { unit: "second" },
+          receiver: "",
+          token: "",
+          flowrate: {
+            value: 0,
+            unit: "second"
+          },
         },
       };
     }

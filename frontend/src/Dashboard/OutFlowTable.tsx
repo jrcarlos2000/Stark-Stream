@@ -72,19 +72,19 @@ export default function OutFlowTable({
   const columns = useMemo(
     () => [
       columnHelper.accessor("to", {
-        header: "To",
+        header: "TO",
         cell: (info) => <strong>{info.getValue()}</strong>,
       }),
       columnHelper.accessor("flowrate", {
-        header: "Flow rate",
+        header: "FLOW RATE / sec",
         cell: (info) => <ColoredFlowrate flowrate={info.getValue()} />,
       }),
       columnHelper.accessor("balance", {
-        header: "Balance",
+        header: "BALANCE",
         cell: (info) => <RealtimeBalance {...info.getValue()} />,
       }),
       columnHelper.accessor("id", {
-        header: "Stop",
+        header: "STOP",
         cell: (info) => {
           const streamId = info.row.original.id;
           return (
@@ -98,7 +98,7 @@ export default function OutFlowTable({
         },
       }),
       columnHelper.accessor("id", {
-        header: "Update",
+        header: "UPDATE",
         cell: (info) => {
           const streamId = info.row.original.id;
           return (
