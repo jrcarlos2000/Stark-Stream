@@ -6,9 +6,9 @@ import TokenItem from "./TokenItem";
 import { IoMdClose } from "react-icons/io";
 
 const tokens = [
-  { image: eth, name: "ETH", description: "Ether" },
-  { image: dai, name: "DAI", description: "Dai Stablecoin" },
-  { image: usdc, name: "USDC", description: "USD Coin" },
+  { image: eth, name: "USDT", description: "Usd Stable Coin" },
+  { image: dai, name: "DAI", description: "dai Stable Coin" },
+  { image: usdc, name: "BTC", description: "Bitcoin" },
 ];
 
 export default function TokenSelectorModal({

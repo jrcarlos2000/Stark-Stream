@@ -88,7 +88,7 @@ export default function Wrap({ action }: { action: any }) {
         <WrappingBox>
           <AmountFormInput placeholder="0.0" value={ref} />
           <TokenContainer>
-            <Token>{selectedToken}x</Token>
+            <Token>m{selectedToken}</Token>
             <Balance>Balance: {updatedTokenBalances? updatedTokenBalances[`m${selectedToken}`] : 0}</Balance>
           </TokenContainer>
         </WrappingBox>
