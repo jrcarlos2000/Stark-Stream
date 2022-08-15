@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 Modal.setAppElement("#__next");
 import { useEffect, useMemo, useState } from "react";
 import { useStarknet, useStarknetCall } from "@starknet-react/core";
-import { usemBTCContract, useUSDTContract, usemDAIContract, usemUSDTContract } from "../hooks/TokenContracts";
+import { useMBTCContract, useMUSDTContract, useMDAIContract } from "../hooks/TokenContracts";
 import { readListOfStreams } from "../utils/core";
 import Table from "./Table";
 import { createColumnHelper } from "@tanstack/react-table";
@@ -28,9 +28,9 @@ export default function OutFlowTable({selectedToken}: {selectedToken: string}) {
     const handleStop = (streamId: number) => {}
     const handleUpdate = (streamId: number) => {}
     const {connectors,account} = useStarknet();
-    const {contract : cmBTC} = usemBTCContract();
-    const {contract : cmDAI} = usemDAIContract();
-    const {contract : cmUSDT} = usemUSDTContract();
+    const {contract : cmBTC} = useMBTCContract();
+    const {contract : cmDAI} = useMDAIContract();
+    const {contract : cmUSDT} = useMUSDTContract();
   
     const contracts : any = {
       'mUSDT' : cmUSDT,

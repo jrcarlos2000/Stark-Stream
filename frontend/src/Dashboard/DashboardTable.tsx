@@ -8,7 +8,7 @@ import { useStarknet, useStarknetCall } from "@starknet-react/core";
 import { parseTokenData } from "../utils/core";
 import InFlowTable from "./InFlowTable";
 import OutFlowTable from "./OutFlowTable";
-// import { usemBTCContract,useUSDTContract, usemDAIContract, usemUSDTContract } from "../hooks/TokenContracts";
+// import { useMBTCContract, useMUSDTContract, useMDAIContract } from "../hooks/TokenContracts";
 import {
   useMBTCContract,
   useUSDTContract,
