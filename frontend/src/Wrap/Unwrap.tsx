@@ -1,12 +1,22 @@
 import styled from "styled-components";
 import { AiOutlineArrowDown } from "react-icons/ai";
 import { IoIosArrowDown } from "react-icons/io";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TokenSelectorModal from "./TokenSelectorModal";
 import Modal from "react-modal";
 Modal.setAppElement("#__next");
 import { FormInput } from "../components/common/FormInput";
-import { BigNumber, utils } from "ethers";
+import { utils } from "ethers";
+import { getAllTokenBalances } from "../utils/core";
+import {
+  useBTCContract,
+  useDAIContract,
+  useUSDTContract,
+  useMBTCContract,
+  useMDAIContract,
+  useMUSDTContract,
+} from "../hooks/TokenContracts";
+import { useStarknet } from "@starknet-react/core";
 
 export default function Unwrap({ action }: { action: any }) {
   const [balance, setBalance] = useState("0");
@@ -14,7 +24,29 @@ export default function Unwrap({ action }: { action: any }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [value, setValue] = useState<any>();
   const [parsedValue, setParsedValue] = useState<any>();
-  const [ref, setRef] = useState();
+  const [ref, setRef] = useState<any>();
+  const [updatedTokenBalances, setUpdatedTokenBalances] = useState<any>();
+  const [selectedTokenBal, setSelectedTokenBal] = useState<number>(0);
+  const [buttonMsg, setButtonMsg] = useState<any>("Downgrade");
+  const { account, connectors } = useStarknet();
+  const { contract: cBTC } = useBTCContract();
+  const { contract: cDAI } = useDAIContract();
+  const { contract: cUSDT } = useUSDTContract();
+  const { contract: cmBTC } = useMBTCContract();
+  const { contract: cmDAI } = useMDAIContract();
+  const { contract: cmUSDT } = useMUSDTContract();
+
+  const contracts: any = {
+    USDT: cUSDT,
+    BTC: cBTC,
+    DAI: cDAI,
+  };
+
+  const mcontracts: any = {
+    USDT: cmUSDT,
+    BTC: cmBTC,
+    DAI: cmDAI,
+  };
 
   const customStyles = {
     content: {
@@ -34,12 +66,67 @@ export default function Unwrap({ action }: { action: any }) {
     },
   };
 
+  useEffect(() => {
+    //update balances
+    const interval = setInterval(() => {
+      if (account && cUSDT && cDAI && cBTC && cmUSDT && cmDAI && cmBTC) {
+        getAllTokenBalances(
+          cUSDT,
+          cBTC,
+          cDAI,
+          cmUSDT,
+          cmBTC,
+          cmDAI,
+          account
+        ).then((data) => {
+          setUpdatedTokenBalances(data);
+        });
+      }
+    }, 4000);
+    return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+  }, []);
+
   const onChangeValue = (e: any) => {
     if (e.target.value.toString() != "") {
       setRef(e.target.value.toString());
       setParsedValue(utils.parseEther(e.target.value.toString()));
+    } else {
+      setRef("0.0");
     }
   };
+  const handleUpgrade = async () => {
+    setButtonMsg("Loading...");
+    const connectorAccount = await connectors[0].account();
+    await connectorAccount.execute([
+      {
+        contractAddress: contracts[selectedToken]
+          ? contracts[selectedToken].address
+          : "",
+        entrypoint: "approve",
+        calldata: [
+          mcontracts[selectedToken].address,
+          parsedValue.toString(),
+          String(0),
+        ],
+      },
+      {
+        contractAddress: mcontracts[selectedToken]
+          ? mcontracts[selectedToken].address
+          : "",
+        entrypoint: "unwrap",
+        calldata: [parsedValue.toString(), String(0)],
+      },
+    ]);
+
+    setButtonMsg("Downgrade");
+  };
+  const handleMax = () => {
+    setValue(updatedTokenBalances[`${selectedToken}`]);
+    setParsedValue(updatedTokenBalances[`${selectedToken}`]);
+  };
+  useEffect(() => {
+    setRef(value);
+  }, [value]);
 
   return (
     <Wrapper>
@@ -52,12 +139,18 @@ export default function Unwrap({ action }: { action: any }) {
           />
           <TokenContainer>
             <TokenSelector onClick={() => setIsModalOpen(true)}>
-              <p>{selectedToken}x</p>
+              <p>m{selectedToken}</p>
               <IoIosArrowDown />
             </TokenSelector>
             <BalanceContainer>
-              <Balance>Balance: {balance}</Balance>
-              <MaxButton>MAX</MaxButton>
+              <Balance>
+                {" "}
+                Balance:{" "}
+                {updatedTokenBalances
+                  ? updatedTokenBalances[`m${selectedToken}`]
+                  : 0}
+              </Balance>
+              <MaxButton onClick={handleMax}>MAX</MaxButton>
             </BalanceContainer>
           </TokenContainer>
         </WrappingBox>
@@ -66,12 +159,12 @@ export default function Unwrap({ action }: { action: any }) {
           <AmountFormInput placeholder="0.0" value={ref} />
           <TokenContainer>
             <Token>{selectedToken}</Token>
-            <Balance>Balance: {balance}</Balance>
+            <Balance>Balance: {selectedTokenBal}</Balance>
           </TokenContainer>
         </WrappingBox>
       </MainContainer>
       <Unit>1 ETHx = 1 ETH</Unit>
-      <Button>Downgrade</Button>
+      <Button onClick={handleUpgrade}>Downgrade</Button>
 
       <Modal
         isOpen={isModalOpen}

@@ -23,7 +23,7 @@ export default function Token({
           {action === "wrap" ? (
             <Name>{token.name}</Name>
           ) : (
-            <Name>{token.name}x</Name>
+            <Name>m{token.name}</Name>
           )}
           <Description>{token.description}</Description>
         </NameContainer>

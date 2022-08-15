@@ -1,14 +1,14 @@
 import styled, { css } from "styled-components";
-import eth from "../../public/eth.png";
+import usdt from "../../public/usdt.png";
 import dai from "../../public/dai.png";
-import usdc from "../../public/usdc.png";
+import btc from "../../public/btc.png";
 import TokenItem from "./TokenItem";
 import { IoMdClose } from "react-icons/io";
 
 const tokens = [
-  { image: eth, name: "USDT", description: "Usd Stable Coin" },
+  { image: usdt, name: "USDT", description: "Usd Stable Coin" },
   { image: dai, name: "DAI", description: "dai Stable Coin" },
-  { image: usdc, name: "BTC", description: "Bitcoin" },
+  { image: btc, name: "BTC", description: "Bitcoin" },
 ];
 
 export default function TokenSelectorModal({

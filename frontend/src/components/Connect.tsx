@@ -6,7 +6,7 @@ type ConnectProps = { account: string | undefined };
 
 export default function Connect({ account }: ConnectProps) {
   const { available, connect, disconnect } = useConnectors();
-
+  console.log(available);
   return (
     <Wrapper>
       {account ? (

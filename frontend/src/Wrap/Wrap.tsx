@@ -1,15 +1,22 @@
 import styled from "styled-components";
 import { AiOutlineArrowDown } from "react-icons/ai";
 import { IoIosArrowDown } from "react-icons/io";
-import { useState, useRef , useEffect} from "react";
+import { useState, useEffect } from "react";
 import TokenSelectorModal from "./TokenSelectorModal";
 import Modal from "react-modal";
 Modal.setAppElement("#__next");
-import { BigNumber, utils } from "ethers";
+import { utils } from "ethers";
 import { FormInput } from "../components/common/FormInput";
 import { useStarknet } from "@starknet-react/core";
-import {getAllTokenBalances} from "../utils/core";
-import { useBTCContract, useDAIContract, useUSDTContract,usemBTCContract,usemDAIContract,usemUSDTContract } from "../hooks/TokenContracts";
+import { getAllTokenBalances } from "../utils/core";
+import {
+  useBTCContract,
+  useDAIContract,
+  useUSDTContract,
+  useMBTCContract,
+  useMDAIContract,
+  useMUSDTContract,
+} from "../hooks/TokenContracts";
 
 export default function Wrap({ action }: { action: any }) {
   const [ref, setRef] = useState<any>();
@@ -18,26 +25,59 @@ export default function Wrap({ action }: { action: any }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [value, setValue] = useState<any>();
   const [parsedValue, setParsedValue] = useState<any>();
+  const [buttonMsg, setButtonMsg] = useState<any>("Upgrade to Super Token");
   const [updatedTokenBalances, setUpdatedTokenBalances] = useState<any>();
-  const {account} = useStarknet();
-  const {contract : cBTC} = useBTCContract();
-  const {contract : cDAI} = useDAIContract();
-  const {contract : cUSDT} = useUSDTContract();
-  const {contract : cmBTC} = usemBTCContract();
-  const {contract : cmDAI} = usemDAIContract();
-  const {contract : cmUSDT} = usemUSDTContract();
+  const [selectedTokenBal, setSelectedTokenBal] = useState<number>(0);
+  const { account, connectors } = useStarknet();
+  const { contract: cBTC } = useBTCContract();
+  const { contract: cDAI } = useDAIContract();
+  const { contract: cUSDT } = useUSDTContract();
+  const { contract: cmBTC } = useMBTCContract();
+  const { contract: cmDAI } = useMDAIContract();
+  const { contract: cmUSDT } = useMUSDTContract();
 
-  useEffect(() => { //update balances
+  const contracts: any = {
+    USDT: cUSDT,
+    BTC: cBTC,
+    DAI: cDAI,
+  };
+
+  const mcontracts: any = {
+    USDT: cmUSDT,
+    BTC: cmBTC,
+    DAI: cmDAI,
+  };
+
+  useEffect(() => {
+    //update balances
     const interval = setInterval(() => {
-      if(account && cUSDT && cDAI && cBTC
-        && cmUSDT && cmDAI && cmBTC){getAllTokenBalances(cUSDT,cBTC,cDAI,cmUSDT,cmBTC,cmDAI, account).then((data) => {
-        setUpdatedTokenBalances(data)
-      })}
+      if (account && cUSDT && cDAI && cBTC && cmUSDT && cmDAI && cmBTC) {
+        getAllTokenBalances(
+          cUSDT,
+          cBTC,
+          cDAI,
+          cmUSDT,
+          cmBTC,
+          cmDAI,
+          account
+        ).then((data) => {
+          setUpdatedTokenBalances(data);
+        });
+      }
     }, 4000);
     return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
-  }, [])
+  }, []);
 
-  console.log(updatedTokenBalances);
+  useEffect(() => {
+    if (!updatedTokenBalances) return;
+    console.log(
+      "print balance dict: ",
+      updatedTokenBalances,
+      updatedTokenBalances[selectedToken]
+    );
+    setSelectedTokenBal(updatedTokenBalances[selectedToken]);
+  }, [selectedToken, updatedTokenBalances]);
+
   const customStyles = {
     content: {
       top: "50%",
@@ -56,16 +96,51 @@ export default function Wrap({ action }: { action: any }) {
     },
   };
 
+  const handleUpgrade = async () => {
+    setButtonMsg("Loading...");
+    const connectorAccount = await connectors[0].account();
+    await connectorAccount.execute([
+      {
+        contractAddress: contracts[selectedToken]
+          ? contracts[selectedToken].address
+          : "",
+        entrypoint: "approve",
+        calldata: [
+          mcontracts[selectedToken].address,
+          parsedValue.toString(),
+          String(0),
+        ],
+      },
+      {
+        contractAddress: mcontracts[selectedToken]
+          ? mcontracts[selectedToken].address
+          : "",
+        entrypoint: "wrap",
+        calldata: [parsedValue.toString(), String(0)],
+      },
+    ]);
+
+    setButtonMsg("Upgrade to Super Token");
+  };
   const onChangeValue = (e: any) => {
     if (e.target.value.toString() != "") {
       setRef(e.target.value.toString());
       setParsedValue(utils.parseEther(e.target.value.toString()));
-    }else{
-      setRef('0.0');
+    } else {
+      setRef("0.0");
     }
   };
 
-  console.log("debugging selected token",selectedToken);
+  const handleMax = () => {
+    setValue(updatedTokenBalances[`${selectedToken}`]);
+    setParsedValue(updatedTokenBalances[`${selectedToken}`]);
+  };
+
+  useEffect(() => {
+    setRef(value);
+  }, [value]);
+
+  console.log("debugging selected token", selectedToken);
   return (
     <Wrapper>
       <MainContainer>
@@ -81,8 +156,8 @@ export default function Wrap({ action }: { action: any }) {
               <IoIosArrowDown />
             </TokenSelector>
             <BalanceContainer>
-              <Balance>Balance: {updatedTokenBalances? updatedTokenBalances[`${selectedToken}`] : 0}</Balance>
-              <MaxButton>MAX</MaxButton>
+              <Balance>Balance: {selectedTokenBal}</Balance>
+              <MaxButton onClick={handleMax}>MAX</MaxButton>
             </BalanceContainer>
           </TokenContainer>
         </WrappingBox>
@@ -91,12 +166,17 @@ export default function Wrap({ action }: { action: any }) {
           <AmountFormInput placeholder="0.0" value={ref} />
           <TokenContainer>
             <Token>m{selectedToken}</Token>
-            <Balance>Balance: {updatedTokenBalances? updatedTokenBalances[`m${selectedToken}`] : 0}</Balance>
+            <Balance>
+              Balance:{" "}
+              {updatedTokenBalances
+                ? updatedTokenBalances[`m${selectedToken}`]
+                : 0}
+            </Balance>
           </TokenContainer>
         </WrappingBox>
       </MainContainer>
       <Unit>1 ETH = 1 ETHx</Unit>
-      <Button>Upgrade to Super Token</Button>
+      <Button onClick={handleUpgrade}>{buttonMsg}</Button>
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
