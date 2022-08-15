@@ -5,7 +5,6 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { IRealtimeBalanceProps, RealtimeBalance } from "./RealtimeBalance";
 import { useRouter } from "next/router";
 
 export type Assets = "A" | "B" | "C";
@@ -18,21 +17,6 @@ export type TokenData = {
 
 const columnHelper = createColumnHelper<TokenData>();
 
-const tableCols = [
-  columnHelper.accessor("to", {
-    header: "TO",
-    cell: (info) => <strong>{info.getValue()}</strong>,
-  }),
-  columnHelper.accessor("stop", {
-    header: "STOP",
-    cell: (info) => <Button>stop</Button>,
-  }),
-  columnHelper.accessor("update", {
-    header: "UPDATE",
-    cell: (info) => <Button>update</Button>,
-  }),
-];
-
 export default function NestedTable({
   data,
   rowData,
@@ -41,15 +25,34 @@ export default function NestedTable({
   rowData: any;
 }) {
   console.log(data, rowData);
+
+  const router = useRouter();
+  const handleStop = () => {
+    console.log("stop", rowData.id);
+    //stop function(rowData.id)
+  };
+  const handleUpdate = () => {
+    router.push(`/stream?update&tx=${rowData.id}`);
+  };
+  const tableCols = [
+    columnHelper.accessor("to", {
+      header: "TO",
+      cell: (info) => <strong>{info.getValue()}</strong>,
+    }),
+    columnHelper.accessor("stop", {
+      header: "STOP",
+      cell: (info) => <Button onClick={handleStop}>stop</Button>,
+    }),
+    columnHelper.accessor("update", {
+      header: "UPDATE",
+      cell: (info) => <Button onClick={handleUpdate}>update</Button>,
+    }),
+  ];
   const table = useReactTable<TokenData>({
     columns: tableCols,
     data,
     getCoreRowModel: getCoreRowModel(),
   });
-  const router = useRouter();
-  const handleUpdate = () => {
-    router.push(`/stream?update&tx=${rowData.id}`);
-  };
   return (
     <Wrapper>
       <Title>{rowData?.original?.asset}</Title>
@@ -153,7 +156,12 @@ const TableContainer = styled.table`
 `;
 
 const Button = styled.button`
+  border: none;
+  color: #000;
+  padding: 5px;
+  border-radius: 5px;
   &:hover {
     cursor: pointer;
+    box-shadow: rgb(204 204 204 / 55%) 0px 0px 6px 3px;
   }
 `;
