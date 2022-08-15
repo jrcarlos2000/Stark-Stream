@@ -1,3 +1,4 @@
+import { formatEther } from "ethers/lib/utils";
 import millify from "millify";
 import { FC, useEffect, useState } from "react";
 import { scaleTimeToSec } from "../constants";
@@ -18,7 +19,8 @@ export const RealtimeBalance: FC<IRealtimeBalanceProps> = (props) => {
         const sti = setInterval(() => {
             const timeElapsed = Date.now() - props.startTime;
             const newBal = intervalFlowrate * timeElapsed + props.staticBalance;
-            setRealtimeBal(newBal);
+            const parsedNewBal = formatEther(newBal);
+            setRealtimeBal(parseFloat(parsedNewBal));
         }, updateInterval)
 
         return () => clearInterval(sti);

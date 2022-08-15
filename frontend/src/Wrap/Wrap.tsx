@@ -1,12 +1,15 @@
 import styled from "styled-components";
 import { AiOutlineArrowDown } from "react-icons/ai";
 import { IoIosArrowDown } from "react-icons/io";
-import { useState, useRef } from "react";
+import { useState, useRef , useEffect} from "react";
 import TokenSelectorModal from "./TokenSelectorModal";
 import Modal from "react-modal";
 Modal.setAppElement("#__next");
 import { BigNumber, utils } from "ethers";
 import { FormInput } from "../components/common/FormInput";
+import { useStarknet } from "@starknet-react/core";
+import {getAllTokenBalances} from "../utils/core";
+import { useBTCContract, useDAIContract, useUSDTContract,usemBTCContract,usemDAIContract,usemUSDTContract } from "../hooks/TokenContracts";
 
 export default function Wrap({ action }: { action: any }) {
   const [ref, setRef] = useState();
@@ -15,6 +18,26 @@ export default function Wrap({ action }: { action: any }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [value, setValue] = useState<any>();
   const [parsedValue, setParsedValue] = useState<any>();
+  const [updatedTokenBalances, setUpdatedTokenBalances] = useState<any>();
+  const {account} = useStarknet();
+  const {contract : cBTC} = useBTCContract();
+  const {contract : cDAI} = useDAIContract();
+  const {contract : cUSDT} = useUSDTContract();
+  const {contract : cmBTC} = usemBTCContract();
+  const {contract : cmDAI} = usemDAIContract();
+  const {contract : cmUSDT} = usemUSDTContract();
+
+  useEffect(() => { //update balances
+    const interval = setInterval(() => {
+      if(account && cUSDT && cDAI && cBTC
+        && cmUSDT && cmDAI && cmBTC){getAllTokenBalances(cUSDT,cBTC,cDAI,cmUSDT,cmBTC,cmDAI, account).then((data) => {
+        setUpdatedTokenBalances(data)
+      })}
+    }, 4000);
+    return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+  }, [])
+
+  console.log(updatedTokenBalances);
   const customStyles = {
     content: {
       top: "50%",
@@ -40,7 +63,7 @@ export default function Wrap({ action }: { action: any }) {
     }
   };
 
-  console.log(parsedValue);
+  console.log("debugging selected token",selectedToken);
   return (
     <Wrapper>
       <MainContainer>
@@ -56,7 +79,7 @@ export default function Wrap({ action }: { action: any }) {
               <IoIosArrowDown />
             </TokenSelector>
             <BalanceContainer>
-              <Balance>Balance: {balance}</Balance>
+              <Balance>Balance: {updatedTokenBalances? updatedTokenBalances[`${selectedToken}`] : 0}</Balance>
               <MaxButton>MAX</MaxButton>
             </BalanceContainer>
           </TokenContainer>
@@ -66,7 +89,7 @@ export default function Wrap({ action }: { action: any }) {
           <AmountFormInput placeholder="0.0" value={ref} />
           <TokenContainer>
             <Token>{selectedToken}x</Token>
-            <Balance>Balance: {balance}</Balance>
+            <Balance>Balance: {updatedTokenBalances? updatedTokenBalances[`m${selectedToken}`] : 0}</Balance>
           </TokenContainer>
         </WrappingBox>
       </MainContainer>
