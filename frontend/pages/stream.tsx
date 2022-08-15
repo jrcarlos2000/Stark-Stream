@@ -2,7 +2,10 @@ import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useMemo } from "react";
 import styled from "styled-components";
-import { IDetailBreakdownMulti, IDetailBreakdownSingle } from "../src/Stream/DetailBreakdown";
+import {
+  IDetailBreakdownMulti,
+  IDetailBreakdownSingle,
+} from "../src/Stream/DetailBreakdown";
 import MultiStream from "../src/Stream/MultiStream";
 
 const Send: NextPage = () => {
@@ -10,9 +13,9 @@ const Send: NextPage = () => {
 
   // stream SEND and UPDATE all go through this component
   const query = useMemo(() => {
-    console.log(router.query)
+    console.log(router.query);
     if (router.query.hasOwnProperty("update")) {
-      console.log("update test: ", router.query)
+      console.log("update test: ", router.query);
       // fetch streaming data from contract
       // test data
       const updateDataSingle: IDetailBreakdownSingle = {
@@ -20,9 +23,9 @@ const Send: NextPage = () => {
         token: "USDC",
         flowrate: {
           value: 0.666,
-          unit: "second"
+          unit: "second",
         },
-      }
+      };
       // const updateDataMulti: IDetailBreakdownMulti = {
       //   receivers: [
       //     {addr: "0x123", perc: 20},
@@ -37,18 +40,18 @@ const Send: NextPage = () => {
       return {
         mode: "Update",
         _streamType: router.query.streamType as string,
-        txData: updateDataSingle
-      }
+        txData: updateDataSingle,
+      };
     } else {
       return {
         mode: "Send",
         _streamType: "Direct",
         txData: {
-          flowrate: {unit: "second"}
-        }
-      }
+          flowrate: { unit: "second" },
+        },
+      };
     }
-  }, [router.query])
+  }, [router.query]);
 
   return (
     <Wrapper>
