@@ -5,8 +5,7 @@ Modal.setAppElement("#__next");
 import { useEffect, useMemo, useState } from "react";
 import { useStarknet, useStarknetCall } from "@starknet-react/core";
 import { usemBTCContract, useUSDTContract, usemDAIContract, usemUSDTContract } from "../hooks/TokenContracts";
-import { parseTokenData } from "../utils/core";
-
+import { readListOfStreams } from "../utils/core";
 import Table from "./Table";
 import { createColumnHelper } from "@tanstack/react-table";
 import { IRealtimeBalanceProps, RealtimeBalance } from "./RealtimeBalance";
@@ -25,20 +24,32 @@ const columnHelper = createColumnHelper<IOutFlowTableData>();
 
 export default function OutFlowTable({selectedToken}: {selectedToken: string}) {
     // CONTRACT INVOKES
+    const [data, setData] = useState<any>([]);
     const handleStop = (streamId: number) => {}
     const handleUpdate = (streamId: number) => {}
+    const {connectors,account} = useStarknet();
+    const {contract : cmBTC} = usemBTCContract();
+    const {contract : cmDAI} = usemDAIContract();
+    const {contract : cmUSDT} = usemUSDTContract();
+  
+    const contracts : any = {
+      'mUSDT' : cmUSDT,
+      'mBTC' : cmBTC,
+      'mDAI' : cmDAI 
+    }
 
     // FETCH DATA: Outflow data of selectedToken of current user
-    const data = [
-        {
-            id: 1,
-            to: "carlos",
-            flowrate: 123,
-            balance: 1,
-            stop: true,
-            update: true,
-        }
-    ]
+
+    useEffect(() => { //update balances
+        const interval = setInterval(() => {
+            readListOfStreams(contracts[selectedToken],account).then((data) => {
+                setData(data);
+            })
+        }, 6000);
+        return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+      }, [])
+
+    console.log('debugging outflow table', selectedToken);
 
     // PREPARE COLUMN
     const columns = useMemo(() => [

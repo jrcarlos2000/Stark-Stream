@@ -1,5 +1,6 @@
 import { formatEther } from "ethers/lib/utils";
 import { bnToUint256, uint256ToBN } from "starknet/dist/utils/uint256";
+import { toBN, toHex } from "starknet/utils/number";
 
 export async function parseTokenData(mUSTBalance, mDAIBalance, mBTCBalance){
     //perform other operations here
@@ -67,5 +68,42 @@ export async function getAllTokenBalances (USDTContract, BTCContract, DAIContrac
         'mBTC' : 0.0,
         'mDAI' : 0.0
         }
+    }
+}
+
+function shortenAddress (address) {
+    const len = address.length
+    return address.slice(0,3) + "..." + address.slice(len-3,len);
+}
+
+export async function readListOfStreams(contract,account) {
+
+    let data = [];
+    try{
+        let res = (await contract.get_all_outflow_streams_by_user(toBN(account)))[0];
+        console.log('debugging readList of streams',res);
+        for(let i=0;i<res.length;i++){
+            data.push({
+                id : i + 1,
+                to : shortenAddress(toHex(toBN(res[i].to)).toString()),
+                flowrate : formatEther(uint256ToBN(res[i].amount_per_second).toString()),
+                balance : formatEther(uint256ToBN(res[i].deposit).toString()),
+                stop : true,
+                update : true
+            })
+        }
+        return data;
+    }catch(e){
+        console.log(e)
+        return [
+            {
+                id: 1,
+                to: "carlos",
+                flowrate: 123,
+                balance: 1,
+                stop: true,
+                update: true,
+            }
+        ]
     }
 }

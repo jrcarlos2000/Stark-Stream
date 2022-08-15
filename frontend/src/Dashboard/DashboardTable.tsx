@@ -11,11 +11,11 @@ import InFlowTable from "./InFlowTable";
 import OutFlowTable from "./OutFlowTable";
 
 export default function DashboardTable() {
-  const [selectedToken, setSelectedToken] = useState<string>("BTC");
+  const [selectedToken, setSelectedToken] = useState<string>("mBTC");
   const handleExpand = (row: any) => {
     const selectedToken = row.original.asset;
     console.log("selected token: ", selectedToken);
-    setSelectedToken(selectedToken.slice(1));  // remove the leading "m"
+    setSelectedToken(selectedToken);  // remove the leading "m"
   }
 
   return (
