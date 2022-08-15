@@ -12,7 +12,7 @@ import {getAllTokenBalances} from "../utils/core";
 import { useBTCContract, useDAIContract, useUSDTContract,usemBTCContract,usemDAIContract,usemUSDTContract } from "../hooks/TokenContracts";
 
 export default function Wrap({ action }: { action: any }) {
-  const [ref, setRef] = useState();
+  const [ref, setRef] = useState<any>();
   const [balance, setBalance] = useState("0");
   const [selectedToken, setSelectedToken] = useState("DAI");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,6 +60,8 @@ export default function Wrap({ action }: { action: any }) {
     if (e.target.value.toString() != "") {
       setRef(e.target.value.toString());
       setParsedValue(utils.parseEther(e.target.value.toString()));
+    }else{
+      setRef('0.0');
     }
   };
 
