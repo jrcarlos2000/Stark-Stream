@@ -16,11 +16,15 @@ const ERC721_symbol = starknet.shortStringToBigInt("CAR");
 const tokenDecimals = ethers.utils.parseUnits("1");
 let cAccount, cAccount2, cCore,cUserRegistry;
 
-const REGISTRY = "user_registry";
-const QFPOOL = "qf_pool";
-const CORE = "core";
-const GAS = "gas";
-const ERC20 = "MockErc20";
+
+const MTOKEN = "m_token";
+const TOKEN = "ERC20";
+const USDT = 'USDT';
+const mUSDT = 'mUSDT';
+const DAI = 'DAI';
+const mDAI = 'mDAI';
+const BTC = 'BTC';
+const mBTC = 'mBTC';
 
 const gasAddr = {
   devnet: "0x62230ea046a9a5fbc261ac77d03c8d41e5d442db2284587570ab46455fd2488",
@@ -57,34 +61,34 @@ function divideLongString (longString) {
 describe("demo Scripts", function () {
   this.timeout(10000_000);
 
-  if (process.env.FLAGS != "pool") return;
+  if (process.env.FLAGS != "demo") return;
 
-  it("add projects to pool", async function () {
+  it("add projects", async function () {
     if (starknet.network == "devnet") {
-        let accounts = await starknet.devnet.getPredeployedAccounts();
-        cAccount = await starknet.getAccountFromAddress(accounts[1].address,accounts[1].private_key,'OpenZeppelin');
-        cAccount2 = await starknet.getAccountFromAddress(accounts[2].address,accounts[2].private_key,'OpenZeppelin');
+      let accounts = await starknet.devnet.getPredeployedAccounts();
+      cAccount = await starknet.getAccountFromAddress(accounts[1].address,accounts[1].private_key,'OpenZeppelin');
     }
 
+    console.log('funding Accounts with eth');
+    const accountsToFund = process.env.ACCOUNTS.split(',');
 
-    let addressesFile = fs.readFileSync('../frontend/src/utils/contractAddresses.json');
+    for(let i=0;i<accountsToFund.length;i++){
+      await axios.post("http://localhost:5050/mint", {
+      'address' : `${accountsToFund[i]}`,
+      'amount' : 10000000000000000000
+      });
+    }
+
+    let addressesFile = fs.readFileSync('../frontend/src/utils/addresses.json');
     let addresses = JSON.parse(addressesFile);
-    const cfCore = await starknet.getContractFactory(CORE);
-    const cCore = await cfCore.getContractAt(addresses[CORE]);
 
-    await cAccount.invoke(cCore,'add_buidl_to_pool',{
-        buidl_id : 1n,
-        pool_id : 1n
-    })
-    await cAccount.invoke(cCore,'add_buidl_to_pool',{
-        buidl_id : 2n,
-        pool_id : 2n
-    })
-    await cAccount2.invoke(cCore,'add_buidl_to_pool',{
-        buidl_id : 3n,
-        pool_id : 2n
-    })
+    const cfMToken = await starknet.getContractFactory(MTOKEN);
+    const cfToken = await starknet.getContractFactory(TOKEN);
+    const cUSDT = await cfToken.getContractAt(addresses[USDT]);
+    
+    for(let i = 0 ;;i++){
+      await cAccount.invoke(cUSDT,'faucet',{});
+    }
 
-
-});
+  })
 });
