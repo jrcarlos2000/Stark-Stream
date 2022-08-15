@@ -3,6 +3,7 @@ import styled, { css } from "styled-components";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import ChainId from "./ChainId";
 
 const NavItems = [
   { title: "Dashboard", href: "/" },
@@ -41,6 +42,7 @@ export default function Header({ account }: any) {
         </NavItemsContainer>
       </NavContainer>
       <Connect account={account} />
+      <ChainId />
     </Wrapper>
   );
 }
