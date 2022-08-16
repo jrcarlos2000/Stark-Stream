@@ -19,5 +19,5 @@ yarn deploy
 ```
 yarn fund
 ```
-After performed a `start_stream` on front end run ```yarn demo```
+After performed a `start_stream` on front end run ```yarn demo```, since we are using devnet, we need to invoke any contract so that our timestamp is updated.
 
